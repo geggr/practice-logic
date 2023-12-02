@@ -1,6 +1,5 @@
 package br.com.university.days;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -41,7 +40,7 @@ public class FirstDay implements PuzzleResolver {
         return ProblemReader.read("problems/day-one", lines -> {
             final var pattern = Pattern.compile("(\\d)");
 
-            final var response = Arrays.stream(lines).map(line -> pattern.matcher(line)).mapToInt(matcher -> {
+            final var response = lines.map(line -> pattern.matcher(line)).mapToInt(matcher -> {
 
                 var isEmpty = !(matcher.find());
 
@@ -78,7 +77,7 @@ public class FirstDay implements PuzzleResolver {
                 .map(Pattern::compile)
                 .toList();
 
-            final var total = Arrays.stream(lines).mapToInt(line -> {
+            final var total = lines.mapToInt(line -> {
                 
                 final var matches = patterns.stream().map(pattern -> {
 
@@ -101,7 +100,7 @@ public class FirstDay implements PuzzleResolver {
 
                     return new NumberMatch(element, start, end);
                 })
-                .toList();
+                .toList();  
 
                 final var first = matches.stream().min(Comparator.comparingInt(NumberMatch::start)).map(this::convert).orElse("");
                 final var last = matches.stream().max(Comparator.comparingInt(NumberMatch::end)).map(this::convert);

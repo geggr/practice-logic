@@ -4,14 +4,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public final class ProblemReader {
 
-    private static final Function<String, String[]> PARSE_FILE_AS_ARRAY = (file) -> file.split("\\n");
+    private static final Function<String, Stream<String>> PARSE_FILE_AS_LINE_STREAM = (file) -> Arrays.stream(file.split("\\n"));
 
-    public static <T> T read(String input, Function<String[], T> handler){
-        return ProblemReader.read(input, PARSE_FILE_AS_ARRAY, handler);
+    public static <T> T read(String input, Function<Stream<String>, T> handler){
+        return ProblemReader.read(input, PARSE_FILE_AS_LINE_STREAM, handler);
     }
 
     public static <P, T> T read(String input, Function<String, P> parser, Function<P, T> handler){
