@@ -1,32 +1,96 @@
 package br.com.university.days;
 
+import static br.com.university.utils.ProblemReader.FILE_AS_ARRAY;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
+import br.com.university.utils.DayReview;
 import br.com.university.utils.ParserUtils;
+import br.com.university.utils.PartitionUtils;
 import br.com.university.utils.ProblemReader;
 
 public class FifthDay implements PuzzleResolver {
 
     @Override
     public String solveDefaultProblem() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'solveDefaultProblem'");
+         final var minimum = ProblemReader.read("statements/day-five", (file) -> file.split("\\n"), maps -> {
+
+            final var seeds = parseSeedPositions(maps[0]);
+            final var lines = Arrays.copyOfRange(maps, 1, maps.length);
+
+            final var almanac = parseAlmanac(lines);
+
+            return seeds
+                .stream()
+                .mapToLong(seed -> {
+                    final var location = almanac.findLocation(seed);
+
+                    System.out.println("Seed with source [%d]  has location [%d]".formatted(seed, location));
+
+                    return location;
+                })
+                .min()
+                .getAsLong();
+        });
+
+        return String.valueOf(minimum);
     }
 
     @Override
+    @DayReview(thought = """
+        Eu nunca deveria estar fazendo isso via brute force
+        Se eu chequei a seed (83) que me leva para => 47
+        não há razão para checar a <84, ..., 92> pois todas serão maiores...
+    """)
     public String solveCompleteProblem() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'solveCompleteProblem'");
+        final var response = ProblemReader.read("statements/day-five", FILE_AS_ARRAY, maps -> {
+
+            var minimum = Long.MAX_VALUE;
+
+            final var lines = Arrays.copyOfRange(maps, 1, maps.length);
+            final var almanac = parseAlmanac(lines);
+            
+            List<Long> parsed = parseSeedPositions(maps[0]);
+
+            var partitions = PartitionUtils.partition(parsed, 2);
+
+            for (var index = 0; index < partitions.size(); index++){
+
+                var partition = partitions.get(index);
+
+                System.out.println("Partition %d / %d".formatted(index, partitions.size()));
+
+                var start = partition.get(0);
+                var end = partition.get(1);
+
+                var local = LongStream
+                    .range(0, end)
+                    .map(it -> start + it)
+                    .map(seed -> {
+                        final var location = almanac.findLocation(seed);
+
+                        System.out.println("Seed with source [%d] has location [%s]".formatted(seed, location));
+
+                        return location;
+                    })
+                    .min()
+                    .getAsLong();
+
+
+                if (local < minimum){
+                    minimum = local;
+                }
+            }
+
+            return minimum;
+        });
+
+        return String.valueOf(response);
     }
 
     private static Almanac parseAlmanac(String[] lines){
@@ -143,21 +207,8 @@ public class FifthDay implements PuzzleResolver {
     }
 
     public static void main(String[] args) {
-        final var minimum = ProblemReader.read("problems/day-five", (file) -> file.split("\\n"), maps -> {
-
-            final var seeds = parseSeedPositions(maps[0]);
-            final var lines = Arrays.copyOfRange(maps, 1, maps.length);
-
-            final var almanac = parseAlmanac(lines);
-
-            return seeds
-                .stream()
-                .mapToLong(seed -> almanac.findLocation(seed))
-                .min()
-                .getAsLong();
-        });
-
-        System.out.println(minimum);
+        var total = new FifthDay().solveCompleteProblem();
+        System.out.println(total);
     }
     
 }

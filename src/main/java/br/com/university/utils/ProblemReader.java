@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 public final class ProblemReader {
 
+    public static final Function<String, String[]> FILE_AS_ARRAY = (file) -> file.split("\\n");
     private static final Function<String, Stream<String>> PARSE_FILE_AS_LINE_STREAM = (file) -> Arrays.stream(file.split("\\n"));
 
     public static <T> T read(String input, Function<Stream<String>, T> handler){
